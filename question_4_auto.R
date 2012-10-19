@@ -20,7 +20,7 @@ tmp <- readLines(con, n.lines.to.read)
 articles <- data.frame()
 for(i in 2:length(tmp)){
   json_data <- fromJSON(paste(tmp[i], collapse=""))
-  json_data <- as.data.frame(json_data)
+  json_data <- as.data.frame(t(json_data))
   articles <- rbind.fill(articles, json_data)
 }
 
