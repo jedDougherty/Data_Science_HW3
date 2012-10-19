@@ -59,8 +59,8 @@ xom.ts.return_new <- xom.ts.return / sqrt(vol.old)
 xom.ts.return_new <- zoo(xom.ts.return_new, exxon$Date)
 plot(xom.ts.return_new)
 
-acf(xom.ts.return_new, na.action=na.pass) #Lags 1&2 are significant!
-pacf(xom.ts.return_new, na.action=na.pass) #Lags 1&2 are significant!
+acf(xom.ts.return_new, na.action=na.pass) #Lags 2-7 are significant!
+pacf(xom.ts.return_new, na.action=na.pass) #Lags 2-7 are significant!
 
 ##Build linear regression on non-normalized log returns to predict price.
 # require(dyn)
@@ -82,14 +82,15 @@ pacf(xom.ts.return_new, na.action=na.pass) #Lags 1&2 are significant!
 #     geom_point(shape=1)
 # dev.off()
 
-#Build ARIMA model for returns.
+#Train ARIMA model on first 100 returns.
 require(forecast)
-xom.arima.fit <- arima(as.ts(xom.ts.return_new), order=c(2,0,1)) #Add 2 lags
+xom.arima.fit <- arima(as.ts(xom.ts.return_new[1:365]), order=c(2,0,1)) #Add 2 lags
 summary(xom.arima.fit) #Coefficients for ARIMA model.
 confint(xom.arima.fit) #Confidence intervals for ARIMA model.
 tsdiag(xom.arima.fit) #Diagnostic tests for ARIMA model.
-xom.forecast <- forecast(xom.arima.fit) #Predict returns using ARIMA model.
-plot(xom.forecast)
+predict(xom.arima.fit)
+
+xom.ts.return_new[1]
 
 #Extract data into DF to prep GGPLOT 
 #Adapted from R-Bloggers: 
