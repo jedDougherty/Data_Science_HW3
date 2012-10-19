@@ -62,65 +62,69 @@ plot(xom.ts.return_new)
 acf(xom.ts.return_new, na.action=na.pass) #Lags 2-7 are significant!
 pacf(xom.ts.return_new, na.action=na.pass) #Lags 2-7 are significant!
 
+
+
+xom.lm.train <- xom.ts.return_new[1 : 5803]  #using the previous half data as the training set
+xom.lm.test <- xom.ts.return_new[5804 : 10803]  ##using the other half data as the testing set
+
+
 ##Build linear regression on non-normalized log returns to predict price.
-# require(dyn)
-# xom.prior2 <- dyn$lm(xom.train ~ lag(xom.train, -1) + lag(xom.train, -2))
-# summary(xom.prior2)
-# plot(xom.prior2)
-# coeff.xom <- coef(xom.prior2)
-# coeff.xom.prior2 <- data.frame(Coefficient=names(coeff.xom), Value=coeff.xom)
-# 
-# #Draw scatterplot of model's coefficients.
-# require(ggplot2)
-# postscript(file="XOM_Coeffs_Scttr.eps", #Save graph to EPS file.
-#            onefile=FALSE, 
-#            width=6,
-#            height=6,
-#            horizontal=FALSE)
-# ggplot(coeff.xom.prior2, aes(x=Value, y=Coefficient)) +
-#     geom_vline(xintercept=0, color="blue", linetype=2) +
-#     geom_point(shape=1)
-# dev.off()
+require(dyn)
+train.function <- function(train.set){
+    train.result <- dyn$lm(train.set ~ lag(train.set, -1) + lag(train.set, -2))
+}
+xom.prior2 <- train.function(xom.lm.train)  #train the initial linear regression model with xom.lm.train
+summary(xom.prior2)
+plot(xom.prior2)
+coeff.xom <- coef(xom.prior2)
+coeff.xom.prior2 <- data.frame(Coefficient=names(coeff.xom), Value=coeff.xom)
 
-#Train ARIMA model on first 100 returns.
-require(forecast)
-xom.arima.fit <- arima(as.ts(xom.ts.return_new[1:365]), order=c(2,0,1)) #Add 2 lags
-summary(xom.arima.fit) #Coefficients for ARIMA model.
-confint(xom.arima.fit) #Confidence intervals for ARIMA model.
-tsdiag(xom.arima.fit) #Diagnostic tests for ARIMA model.
-predict(xom.arima.fit)
+ #Draw scatterplot of model's coefficients.
+ require(ggplot2)
+ postscript(file="XOM_Coeffs_Scttr.eps", #Save graph to EPS file.
+            onefile=FALSE, 
+            width=6,
+            height=6,
+            horizontal=FALSE)
+ ggplot(coeff.xom.prior2, aes(x=Value, y=Coefficient)) +
+     geom_vline(xintercept=0, color="blue", linetype=2) +
+     geom_point(shape=1)
+ dev.off()
 
-xom.ts.return_new[1]
+## use the testing data to do the prediction and draw the (cumulative) PnL of the model
+test.set <- data.frame(1, lag(xom.lm.test, -1)[-1], lag(xom.lm.test, -2))  #data set for predict
+test.set <- as.matrix(test.set)
 
-#Extract data into DF to prep GGPLOT 
-#Adapted from R-Bloggers: 
-#http://www.r-bloggers.com/plotting-forecast-objects-in-ggplot-part-1-extracting-the-data-2/
-
-##Extract Source and Training Data.
-ds <- as.data.frame(xom.ts.return)
-names(ds)<-'observed'
-ds$date <- as.Date(time(window(xom.ts.return)))
+test.pnl <- vector(mode = "numeric", dim(test.set)[1])
+for(i in 1 : dim(test.set)[1]){
     
-#Extract the Fitted Values.
-dfit <- as.data.frame(xom.forecast$fitted)
-names(dfit)[1] <- 'predicted' #[?]Why all the NAs? What date do these forecast refer to?
-# dfit <- dfit[1:10801,]
-# dfit$date <- as.Date(time(window(xom.ts.return)))
+    if((i + 3) <= dim(test.set)[1]){
+        ##do the prediction 
+        new.test.data <- test.set[i, ]
+        test.predict <- new.test.data %*% coeff.xom  #use the coeff to calculate the predicted data of the third day
+        test.pnl[i] <- test.predict * xom.lm.test[i + 2]  #calculate the pnl for the i data of test set
+        # when we calculate the test.set, we used 2 lag. So the xom.lm.test should be the date after two days
+        
+        #browser()
+        
+        ## update the linear model with the i data of test set
+        xom.lm.train <- zoo(c(xom.lm.train, xom.lm.test[i + 2 + 1]))  #put the new data into our training set
+        xom.prior.updated <- train.function(xom.lm.train)  #train the initial linear regression model with the new xom.lm.train
+        
+        coeff.xom <- coef(xom.prior.updated)        
+    }
+    
+}
+#predict.test.set <- predict(xom.prior2, newdata = test.set)
 
-ds <- merge(ds,dfit,all.x=T) #Merge fitted values with source and training data
+save(test.pnl, file = "test_pnl.rda")
 
-#Graph extracted data into GGPLOT.
-library(ggplot2)
-library(scales)
+test.pnl.modified <- test.pnl[- c(length(test.pnl)-2 ,length(test.pnl)-1, length(test.pnl))]  
+#Since the last three data didn't be calculated, they are all zero. So we get rid of them.
 
-ggplot(data=ds,aes(x=date,y=observed)) +
-    geom_line(col='red') +
-    geom_line(aes(y=predicted),col='blue') +
-    scale_y_continuous(name='Units of Y') +
-    opts(axis.text.x=theme_text(size=10),
-         title='Arima Fit to Exxon\n (Blue=Predicted, Red=Observed)')
+c.pnl <- vector(mode = "numeric", length = length(test.pnl.modified))  #This the cumulated PnL
+for(i in 1:length(test.pnl.modified)){
+    c.pnl[i] <- sum(test.pnl.modified[1 : i])
+}
 
-##Convert return back to price.
-ds$obs.price <- exp(ds$observed)
-ds$p0 <- exxon$Close[1:10801]
-ds$p1 <- ds$obs.price * ds$p0
+plot(c.pnl)
