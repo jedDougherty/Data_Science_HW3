@@ -37,5 +37,39 @@ grabber <- DT[,sum((action == "Liked")-(action == "Disliked")),by=title]
 grabber_sorted <- grabber[order(V1)]
 
 #Number of actions in 2011
-2011_articles <- length(grep("^2011",listings$timestamp,value=TRUE))
+#To doublecheck this I opened the entire file in Vim
+#and used the following command
+#:%s/\"timestamp\": \"201-\d\d-\d\d//gn
+#This returned 10709526 actions in 2011
+
+#Number of actions in 2011
+year_articles <- length(grep("^2011",listings$timestamp,value=TRUE))
+year_articles * 19831300/n.lines.to.read
+#This gives us a very similar number, which backs up the idea that we have
+#a good random sample.
+
+#5 new questions:
+#What movies did regular users love? Are they different from one time users?
+#Regular users defined as appearing on the site 3 or more times
+PU <- as.data.table(listings)
+setkey(PU,userId)
+grabber <- PU[,length(userId),by=userId]
+grabber_sorted <- grabber[order(V1)]
+
+#Did people without numbers in their user names
+#have better taste in movies? Using rotten_tomatoes 
+#api, lets check it out. (I've long held the 
+#suspicion that having a number in your user
+#name signified a lack of intelligence/inventiveness)
+
+
+#What encouraged more comments, movies or TV Shows?
+#Who had a larger overall population, who inspired more
+#debate?
+
+
+#What was the most watched show in each year?
+#What was the most watched Movie?
+
+
 

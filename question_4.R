@@ -18,6 +18,7 @@ a<-system.time(for(i in 2:n.lines.to.read){ #Have to set it to 2 because first l
   # listings <- rbind.fill(listings, json_data) #This does automatically what Eurry programmed last time
   listings[[i]] <- as.data.frame(t(json_data))
 })
+close(con)
 
 b<-system.time(listings <- rbind.fill(listings))
 
@@ -30,6 +31,18 @@ actions <- unique(listings$action)
 #Finds number of these unique actions
 action_table <- table(listings$action)
 
+
+
+#Number of actions in 2011
+#For this I opened the entire file in Vim
+#and used the following command
+#:%s/\"timestamp\": \"201-\d\d-\d\d//gn
+#This returned 10709526 actions in 2011
+
+#Number of actions in 2011
+2011_articles <- length(grep("^2011",listings$timestamp,value=TRUE))
+
+
 #Top Ten Movies
 DT <- as.data.table(listings)
 setkey(DT,title)
@@ -37,6 +50,6 @@ DT <- DT[modelName == "movies",]
 grabber <- DT[,sum((action == "Liked")-(action == "Disliked")),by=title]
 grabber_sorted <- grabber[order(V1)]
 
-#Number of actions in 2011
-2011_articles <- length(grep("^2011",listings$timestamp,value=TRUE))
+
+
 
