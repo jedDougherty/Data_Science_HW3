@@ -7,18 +7,18 @@ library("plyr")
 library("data.table")
 #library("rjson")
   
-  n.lines.to.read <- 198496 #Put in how many lines to read here.
-  tmp <- readLines("~/Data_Science_HW3/subset_large", n.lines.to.read)
-  listings_large <- list()
+  n.lines.to.read <- 99340 #Put in how many lines to read here.
+  tmp <- readLines("~/Data_Science_HW3/subset_zerozerofive", n.lines.to.read)
+  listings_onek <- list()
   a<-system.time(for(i in 2:n.lines.to.read){ #Have to set it to 2 because first line is stupid title
     json_data <- fromJSON(paste(tmp[i], collapse=""))
    # listings <- rbind.fill(listings, json_data) #This does automatically what Eurry programmed last time
-    listings_large[[i]] <- as.data.frame(t(json_data))
+    listings_onek[[i]] <- as.data.frame(t(json_data))
   })
-  
-  b<-system.time(listings_large <- rbind.fill(listings_large))
-  
-  
+  a
+  b<-system.time(listings_onek <- rbind.fill(listings_onek))
+  #rbindlist.data.frame <- rbindlist(listings_onek)
+  b
   a+b
 #Finds Unique actions in the data
 actions <- unique(listings$action)
