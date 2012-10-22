@@ -10,16 +10,19 @@ library("data.table")
 file.path <- "http://getglue-data.s3.amazonaws.com/getglue_sample.tar.gz"
 con <- gzcon(url(file.path))
 
-n.lines.to.read <- 10 #Put in how many lines to read here.
+n.lines.to.read <- 1000 #Put in how many lines to read here.
 tmp <- readLines(con, n.lines.to.read)
-listings <- data.frame()
-for(i in 2:length(tmp)){ #Have to set it to 2 because first line is stupid title
+listings <- list()
+a<-system.time(for(i in 2:n.lines.to.read){ #Have to set it to 2 because first line is stupid title
   json_data <- fromJSON(paste(tmp[i], collapse=""))
-  json_data <- as.data.frame(t(json_data))
-  listings <- rbind.fill(listings, json_data) #This does automatically what Eurry programmed last time
-}
+  # listings <- rbind.fill(listings, json_data) #This does automatically what Eurry programmed last time
+  listings[[i]] <- as.data.frame(t(json_data))
+})
 
-View(listings)
+b<-system.time(listings <- rbind.fill(listings))
+
+
+a+b
 
 #Finds Unique actions in the data
 actions <- unique(listings$action)
