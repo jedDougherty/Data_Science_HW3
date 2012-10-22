@@ -81,7 +81,7 @@ p3 + geom_line() + geom_abline(intercept = 0, slope = 0,size=1,colour='gray')
 
 
 ##normalized the log.return with volatility
-log.return.new <- log.return / vol.old
+log.return.new <- log.return / sqrt(vol.old)
 
 log.new <- data.frame(log.return.new, log.time = my_data$time[-1])
 p4 <- ggplot(log.new, aes(y = log.new$log.return.new, x = log.new$log.time))
