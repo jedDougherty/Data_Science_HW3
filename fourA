@@ -1,0 +1,28 @@
+4a)
+After reading in the first 1000 rows and noting the 
+difficulties inherent in the raw data,we made several 
+decisions about how to handle the data that should be 
+noted upfront. First, we used our own way
+of reading the data that was more than four times faster
+that the lapply, ldply way suggested in the lab. Even so,
+the length of time taken increased O(x^2) over time in relation
+to the number of rows.As a final problem, my computer - 
+a fast new macbook - did not have the memory to hold all 
+19 million rows in memory at the same time.
+
+
+<Insert chart here>
+
+
+Even with our faster data manipulation algorithm, reading in
+the 19,831,300 rows of data and putting them into a data frame
+would have taken a prohibitively long time on our pcs. 
+To get around that problem I wrote a perl script to randomly
+sample the data without having to first process all of it. It
+was necessary to randomly sample instead of taking the first 
+several thousand rows because the rows were arranged 
+chronologically, and we needed to see a sample of the data
+across all time, not just in 2008-2010.
+
+This allowed us to take random samples of 19,000 rows (~1/1000th of
+the dataset) and 98,000 rows (~1/500th of the dataset). 
