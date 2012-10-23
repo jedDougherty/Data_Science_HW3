@@ -25,10 +25,13 @@ actions <- unique(listings_onek$action)
 
 #Finds the number of Unique users in the data
 users <- unique(listings_onek$userId)
+length(users)*19831300/n.lines.to.read
+users_small <- unique(listings$userId)
+users_v_small <- unique(articles$userId)
 
 #Finds number of these unique actions
 action_table <- table(listings_onek$action)
-
+round(action_table*19831300/n.lines.to.read)
 #We'll use the data.table format for the rest of our 
 #manipulation
 DT <- as.data.table(listings_onek)
