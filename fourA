@@ -25,4 +25,19 @@ chronologically, and we needed to see a sample of the data
 across all time, not just in 2008-2010.
 
 This allowed us to take random samples of 19,000 rows (~1/1000th of
-the dataset) and 98,000 rows (~1/500th of the dataset). 
+the dataset) and 98,000 rows (~1/500th of the dataset).
+
+4b)In our 98,000 person dataset we found that users took
+the following actions:
+Liked  Disliked  Unwanted Favorited     Saved   Checkin   Comment    Looked      Said 
+38348      2335      1366      1456       524     54916         6        17       371 
+
+Extrapolated to the total dataset... we can assume that
+users took around the following amounts of actions:
+   Liked  Disliked  Unwanted Favorited     Saved   Checkin   Comment    Looked      Said 
+7655433    466137    272695    290662    104606  10962912      1198      3394     74063 
+
+Determining the number of unique users in the dataset is difficult.
+Because a random sampling may not accurately show the number of repeat
+users, we took random samplings at multiple sizes and tried to extract
+a pattern.
