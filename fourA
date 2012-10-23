@@ -167,8 +167,40 @@ People commented more often on movies they liked
 than on movies they disliked. They commented by far the most
 on checkins.
 
-4. Movies V. TV Shows. 
+4. Movies V. TV Shows.
 Which had more comments?
 Which had more checkins?
 Ordered by year?
+Actions By Year
+            2008  2009  2010  2011  2012
+  movies       1   319  6895 20209 10231
+  tv_shows     1    72  3314 33048 23884
+Actions split by year
+
+, ,  = movies
+             2008  2009  2010  2011  2012
+  Liked         1   275  5357 12190  5187
+  Disliked      0    44   513   480   241
+  Unwanted      0     0   300   399    95
+  Favorited     0     0   195   396   241
+  Saved         0     0   133    90    27
+  Checkin       0     0   395  6644  4399
+  Comment       0     0     2     2     1
+  Looked        0     0     0     5     0
+  Said          0     0     0     3    40
+
+, ,  = tv_shows
+
+           
+             2008  2009  2010  2011  2012
+  Liked         1    58  1402  8574  5278
+  Disliked      0    14   318   374   350
+  Unwanted      0     0   156   306   108
+  Favorited     0     0    68   273   276
+  Saved         0     0    23    41    14
+  Checkin       0     0  1347 23445 17572
+  Comment       0     0     0     1     0
+  Looked        0     0     0    12     0
+  Said          0     0     0    22   286
+
 

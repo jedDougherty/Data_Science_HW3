@@ -45,7 +45,6 @@ DT <- as.data.table(listings_onek)
 #Finds actions where a comment was left
 DT[comment != "",]
 action_table <- table(DT[comment != "",]$action)
-
 #Top Ten Movies
 
 setkey(DT,title)
@@ -66,19 +65,34 @@ year_articles * 19831300/n.lines.to.read
 #a good random sample.
 
 #5 new questions:
-#What movies did power users love? Are they different from one time users?
-#Regular users defined as the 100 people with the most user name appearances
-setkey(DT,userId)
-DT_users <- DT[,length(timestamp),by=userId]
-DT_users <- DT_users[order(V1)]
-power_users <- tail(DT_users,100)
-DT_movie_users <- DT[userId == power_users$userId,]
-grabber <- DT_movies[,sum((action == "Liked")-(action == "Disliked")),by="title"]
-grabber_sorted <- grabber[order(V1)]
+
 
 #Check ins test
 check_in <- DT_movies[,sum(action == "Checkin"),by="title"]
 check_in_sorted <- check_in[order(V1)]
+
+#Check ins by user to determine Pareto
+check_in_user <- DT[,sum(action == "Checkin"),by="userId"]
+check_in_User_sorted <- check_in_user[order(V1)]
+top_twenty <- tail(check_in_User_sorted,length(users)*.2)
+total_checks <- sum(check_in_user$V1)
+twenty_checks <- sum(top_twenty$V1)
+twenty_checks/total_checks
+
+#What movies did power users love? Are they different from one time users?
+#Regular users defined as the top 1% of users by action
+#with the most user name appearances
+setkey(DT,userId)
+active_user <- DT[,sum(action != ""),by="userId"]
+active_User_sorted <- active_user[order(V1)]
+top_one <-tail(active_User_sorted,length(users)*.01)
+DT_top_users <- DT_movies[userId %in% top_one$userId]
+check_in_top<- DT_top_users[,sum(action == "Checkin"),by="title"]
+check_in_top_sorted <- check_in_top[order(V1)]
+likes_top<- DT_top_users[,sum((action == "Liked")-(action == "Disliked")),by="title"]
+likes_top_sorted <- likes_top[order(V1)]
+
+top_one
 #Did people without numbers in their user names
 #have better taste in movies? Using rotten_tomatoes 
 #api, lets check it out. (I've long held the 
@@ -89,10 +103,12 @@ check_in_sorted <- check_in[order(V1)]
 #What encouraged more comments, movies or TV Shows?
 #Who had a larger overall population, who inspired more
 #debate?
-
+action_table <- table(DT[comment != "",]$modelName)
 
 #What was the most watched show in each year?
 #What was the most watched Movie?
-
+DT[,year:=year(timestamp)]
+DT[,date:=as.Date(timestamp)]
+table(modelType,year)
 
 
