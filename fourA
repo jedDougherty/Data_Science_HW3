@@ -110,8 +110,8 @@ up as check ins.
 ------
 
 Instead of using R, I just opened up the whole dataset
-in Vim and used the following line to count the numberof timestamps:
-of timestamps::
+in Vim and used the following line to count the number
+of timestamps:
 %s/\"timestamp\": \"2011-\d\d-\d\d//gn
 This returned 10709526 actions in 2011
 We can do the same thing with our sample set in R.
@@ -121,4 +121,54 @@ we get: 10631725, which is very similar to the actual number
 
 ------
 
+1. Do check ins follow the Pareto effect?
+Yes they do!
+the 20 percent of users with the most check ins
+account for 80.1 of check-ins, 
+following the Pareto effect precisely
+
+2. Does the 1% have a different set of favorite movies? The
+1% is defined by the 1% of users with the most actions.
+Not really when it comes to check ins: These are top check ins
+for the 1%
+                                       title  V1
+10:                             Tower Heist  18
+ 9:                               Immortals  18
+ 8:                        American Reunion  18
+ 7:                               Zookeeper  19
+ 6:                                 In Time  19
+ 5:                           Puss In Boots  20
+ 4:                              The Smurfs  23
+ 3:                   Marvel's The Avengers  34
+ 2:                        The Hunger Games  48
+ 1: The Twilight Saga: Breaking Dawn Part 1 177
+The Likes are all different.
+                     title V1
+10:               Superbad  4
+ 9:    Alice in Wonderland  4
+ 8:                  Dumbo  4
+ 7:           The Proposal  4
+ 6:       The Tree of Life  4
+ 5: The Amazing Spider-Man  4
+ 4:        We Bought a Zoo  4
+ 3:                  Shrek  5
+ 2:           Fright Night  5
+ 1:     Sex and the City 2  5
+Once again, almost all of these liked movies came out before 
+2008, but the lists are not similar. And what is up with
+Sex and the City 2 topping the list? Isn't that one of
+the worst movies ever made?
+
+3. What did people comment on more? 
+liked moves or disliked movies
+    Liked  Disliked  Unwanted Favorited     Saved   Checkin   Comment    Looked      Said 
+      258        14         1        58         6     11933         6         0       351 
+People commented more often on movies they liked
+than on movies they disliked. They commented by far the most
+on checkins.
+
+4. Movies V. TV Shows. 
+Which had more comments?
+Which had more checkins?
+Ordered by year?
 
