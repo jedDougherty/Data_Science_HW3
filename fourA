@@ -55,6 +55,70 @@ in the new questions
 
 ------
 
-T
+Depending on how you want to define most popular, there are several ways
+to answer this question. The first and most simple way we used
+was to subtract the number of dislikes from the number of likes for
+each movie. We then get the following Movies:
+
+                                        title V1
+10:                                 Inception 66
+ 9:                                   Titanic 67
+ 8:                               Ratatouille 68
+ 7:                                Fight Club 68
+ 6:                              The Hangover 69
+ 5:                              Forrest Gump 70
+ 4:                                    Avatar 78
+ 3:                                        Up 79
+ 2: Lord of the Rings: The Return of the King 81
+ 1:                                  Iron Man 82
+What a bunch of nerds on this site!
+In comparison here are the ten least liked movies:
+                                    title V1
+ 1:                               Evening -2
+ 2: The Fast and the Furious: Tokyo Drift -2
+ 3:                             Max Payne -2
+ 4:                Left Behind: The Movie -2
+ 5:                   Tomorrow Never Dies -2
+ 6:                    The Pink Panther 2 -2
+ 7:                                  2046 -2
+ 8:                         The Good Girl -2
+ 9:                       Dressed to Kill -2
+10:                               4.3.2.1 -2
+Yep! Those films pretty much suck. Except for
+The Fast and the Furious: Tokyo Drift. We're convinced
+that bad boy is going to become a cult classic.
+
+Raw popularity can also be measured by number of check ins.
+The ten films with the most check ins are as follows:
+                                            title  V1
+10:                                 Puss In Boots  78
+ 9:                                    The Smurfs  79
+ 8:                          Dr. Seuss' The Lorax  85
+ 7:                                  Dark Shadows  86
+ 6:            Captain America: The First Avenger  97
+ 5: Harry Potter and the Deathly Hallows: Part II 103
+ 4:                                   The Muppets 120
+ 3:                         Marvel's The Avengers 294
+ 2:                              The Hunger Games 340
+ 1:       The Twilight Saga: Breaking Dawn Part 1 388
+
+Wow that is a totally different list. A theory for this
+is that people's favorite movies often came out before
+the site started, meaning that only rewatches would show
+up as check ins.
+
+------
+
+Instead of using R, I just opened up the whole dataset
+in Vim and used the following line to count the numberof timestamps:
+of timestamps::
+%s/\"timestamp\": \"2011-\d\d-\d\d//gn
+This returned 10709526 actions in 2011
+We can do the same thing with our sample set in R.
+year_articles <- length(grep("^2011",listings_onek$timestamp,value=TRUE))
+By multiplying by (total_data_set_size)/(99340)
+we get: 10631725, which is very similar to the actual number
+
+------
 
 

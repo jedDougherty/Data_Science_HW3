@@ -31,11 +31,20 @@ users_v_small <- unique(articles$userId)
 
 #Finds number of these unique actions
 action_table <- table(listings_onek$action)
+
+
 round(action_table*19831300/n.lines.to.read)
+
+
 #We'll use the data.table format for the rest of our 
 #manipulation
-DT <- as.data.table(listings_onek)
 
+
+
+DT <- as.data.table(listings_onek)
+#Finds actions where a comment was left
+DT[comment != "",]
+action_table <- table(DT[comment != "",]$action)
 
 #Top Ten Movies
 
@@ -66,6 +75,10 @@ power_users <- tail(DT_users,100)
 DT_movie_users <- DT[userId == power_users$userId,]
 grabber <- DT_movies[,sum((action == "Liked")-(action == "Disliked")),by="title"]
 grabber_sorted <- grabber[order(V1)]
+
+#Check ins test
+check_in <- DT_movies[,sum(action == "Checkin"),by="title"]
+check_in_sorted <- check_in[order(V1)]
 #Did people without numbers in their user names
 #have better taste in movies? Using rotten_tomatoes 
 #api, lets check it out. (I've long held the 
