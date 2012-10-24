@@ -5,6 +5,7 @@ install.packages("data.table")
 library("RJSONIO")
 library("plyr")
 library("data.table")
+library("ggplot2")
 #library("rjson")
   
   n.lines.to.read <- 99340 #Put in how many lines to read here.
@@ -42,6 +43,8 @@ round(action_table*19831300/n.lines.to.read)
 
 
 DT <- as.data.table(listings_onek)
+DT[,year:=year(timestamp)]
+DT[,dates:=as.Date(timestamp)]
 #Finds actions where a comment was left
 DT[comment != "",]
 action_table <- table(DT[comment != "",]$action)
@@ -49,6 +52,7 @@ action_table <- table(DT[comment != "",]$action)
 
 setkey(DT,title)
 DT_movies <- DT[modelName == "movies",]
+DT_shows <- DT[modelName == "tv_shows",]
 grabber <- DT_movies[,sum((action == "Liked")-(action == "Disliked")),by="title"]
 grabber_sorted <- grabber[order(V1)]
 
@@ -107,8 +111,87 @@ action_table <- table(DT[comment != "",]$modelName)
 
 #What was the most watched show in each year?
 #What was the most watched Movie?
-DT[,year:=year(timestamp)]
-DT[,date:=as.Date(timestamp)]
-table(modelType,year)
 
+action_year<-as.data.frame(table(DT$action,DT$year))
+heatmap(action_year)
+?lattice
+
+plot <- ggplot(action_year)
+plot + geom_line(aes(x=Var2, y=Freq, group=Var1)) + scale_x_discrete(name="Actual Class") + 
+  scale_y_discrete(name="Predicted Class") +
+  scale_fill_gradient(
+                      low="lightgray",
+                      high="blue") + 
+                        labs(fill="Frequency")
+dev.off()
+
+
+##
+#Finds check ins per day for top movies and TV shows
+#with a timestamp
+setkey(DT,title,dates)
+DT <- DT[timestamp!="NA",]
+DT_movies <- DT[modelName == "movies",]
+DT_shows <- DT[modelName == "tv_shows",]
+check_movies <- DT_movies[,sum(action == "Checkin"),by="title"]
+check_shows <- DT_shows[,sum(action == "Checkin"),by="title"]
+check_movies_sorted <- check_movies[order(-V1)]
+check_shows_sorted <- check_shows[order(-V1)]
+top_movies <- check_movies_sorted[1:5]
+top_shows <- check_shows_sorted[1:5]
+DT_top_movies <- DT_movies[title %in% top_movies$title,]
+DT_top_shows <- DT_shows[title %in% top_shows$title,]
+m <- as.data.frame(DT_top_movies)
+s <- as.data.frame(DT_top_shows)
+
+###### This looks sooooo pretty but it's not what I want
+moviez <- ggplot(m,aes(dates, fill=title))
+moviez <- moviez + geom_density(alpha = .2) + xlim(as.Date("2010-12-31"),max(DT_top_movies$dates))
+moviez
+###### Plots movies checkins over time
+
+postscript(file="linear_graph.eps", #Save graph to EPS file. Change file name.
+           onefile=FALSE,
+           width=6, #Width in inches.
+           height=6, #Height in inches.
+           horizontal=FALSE)
+
+moviez <- ggplot(m,aes(dates,..count.., colour=title))
+moviez <- moviez + geom_freqpoly(binwidth=15) + xlim(as.Date("2010-12-31"),max(DT_top_movies$dates))
+moviez
+
+dev.off()
+
+###### Histogram
+moviez <- ggplot(m,aes(dates, fill=title))
+moviez <- moviez + geom_bar(,binwidth=15) + xlim(as.Date("2010-12-31"),max(DT_top_movies$dates))
+moviez
+###### Plots all movie checkins over time
+moviezall <- ggplot(m,aes(dates,..count..))
+moviezall <- moviezall + geom_freqpoly(binwidth=15) + xlim(as.Date("2010-12-31"),max(DT_top_movies$dates))
+moviezall
+###### Plots show checkins over time
+showz <- ggplot(s,aes(dates,..count.., colour=title))
+showz <- showz + geom_freqpoly(binwidth=15) + xlim(as.Date("2010-12-31"),max(DT_top_shows$dates))
+showz
+###### Plots all show checkins over time
+showzall <- ggplot(s,aes(dates,..count..))
+showzall <- showzall + geom_freqpoly(binwidth=30) + xlim(as.Date("2010-12-31"),max(DT_top_shows$dates))
+showzall
+###### Histogram
+moviez <- ggplot(s,aes(dates, fill=title))
+moviez <- moviez + geom_bar(binwidth=15,alpha=.75) + xlim(as.Date("2010-12-31"),max(DT_top_shows$dates))
+moviez
+######
+postscript(file="show_hist.eps", #Save graph to EPS file. Change file name.
+           onefile=FALSE,
+           width=6, #Width in inches.
+           height=6, #Height in inches.
+           horizontal=FALSE)
+
+moviez <- ggplot(s,aes(dates, fill=title))
+moviez <- moviez + geom_bar(binwidth=15) + xlim(as.Date("2010-12-31"),max(DT_top_shows$dates))
+moviez
+
+dev.off()
 
