@@ -13,7 +13,6 @@ library("ggplot2")
   listings_onek <- list()
   a<-system.time(for(i in 2:n.lines.to.read){ #Have to set it to 2 because first line is stupid title
     json_data <- fromJSON(paste(tmp[i], collapse=""))
-   # listings_onek <- rbind.fill(listings_onek, json_data) #This does automatically what Eurry programmed last time
     listings_onek[[i]] <- as.data.frame(t(json_data))
   })
   a
@@ -32,24 +31,20 @@ users_v_small <- unique(articles$userId)
 
 #Finds number of these unique actions
 action_table <- table(listings_onek$action)
-
-
 round(action_table*19831300/n.lines.to.read)
 
 
 #We'll use the data.table format for the rest of our 
 #manipulation
-
-
-
 DT <- as.data.table(listings_onek)
 DT[,year:=year(timestamp)]
 DT[,dates:=as.Date(timestamp)]
+
 #Finds actions where a comment was left
 DT[comment != "",]
 action_table <- table(DT[comment != "",]$action)
-#Top Ten Movies
 
+#Top Ten Movies
 setkey(DT,title)
 DT_movies <- DT[modelName == "movies",]
 DT_shows <- DT[modelName == "tv_shows",]
@@ -97,34 +92,13 @@ likes_top<- DT_top_users[,sum((action == "Liked")-(action == "Disliked")),by="ti
 likes_top_sorted <- likes_top[order(V1)]
 
 top_one
-#Did people without numbers in their user names
-#have better taste in movies? Using rotten_tomatoes 
-#api, lets check it out. (I've long held the 
-#suspicion that having a number in your user
-#name signified a lack of intelligence/inventiveness)
 
 
 #What encouraged more comments, movies or TV Shows?
 #Who had a larger overall population, who inspired more
 #debate?
 action_table <- table(DT[comment != "",]$modelName)
-
-#What was the most watched show in each year?
-#What was the most watched Movie?
-
-action_year<-as.data.frame(table(DT$action,DT$year))
-heatmap(action_year)
-?lattice
-
-plot <- ggplot(action_year)
-plot + geom_line(aes(x=Var2, y=Freq, group=Var1)) + scale_x_discrete(name="Actual Class") + 
-  scale_y_discrete(name="Predicted Class") +
-  scale_fill_gradient(
-                      low="lightgray",
-                      high="blue") + 
-                        labs(fill="Frequency")
-dev.off()
-
+actions <- table(DT$action,DT$year,DT$modelName)
 
 ##
 #Finds check ins per day for top movies and TV shows
@@ -149,19 +123,9 @@ moviez <- ggplot(m,aes(dates, fill=title))
 moviez <- moviez + geom_density(alpha = .2) + xlim(as.Date("2010-12-31"),max(DT_top_movies$dates))
 moviez
 ###### Plots movies checkins over time
-
-postscript(file="linear_graph.eps", #Save graph to EPS file. Change file name.
-           onefile=FALSE,
-           width=6, #Width in inches.
-           height=6, #Height in inches.
-           horizontal=FALSE)
-
 moviez <- ggplot(m,aes(dates,..count.., colour=title))
 moviez <- moviez + geom_freqpoly(binwidth=15) + xlim(as.Date("2010-12-31"),max(DT_top_movies$dates))
 moviez
-
-dev.off()
-
 ###### Histogram
 moviez <- ggplot(m,aes(dates, fill=title))
 moviez <- moviez + geom_bar(,binwidth=15) + xlim(as.Date("2010-12-31"),max(DT_top_movies$dates))
@@ -182,7 +146,8 @@ showzall
 moviez <- ggplot(s,aes(dates, fill=title))
 moviez <- moviez + geom_bar(binwidth=15,alpha=.75) + xlim(as.Date("2010-12-31"),max(DT_top_shows$dates))
 moviez
-######
+######convert stuff to eps
+
 postscript(file="show_hist.eps", #Save graph to EPS file. Change file name.
            onefile=FALSE,
            width=6, #Width in inches.
